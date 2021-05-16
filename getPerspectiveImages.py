@@ -1,12 +1,14 @@
 import os
 import cv2 
-import Equirec2Perspec.Equirec2Perspec as E2P 
+import Equirec2Perspec.Equirec2Perspec as E2P
+import time
 
 if __name__ == '__main__':
 
     toursFolders = ['tours_1','tours_2','tours_3','tours_4','tours_5','tours_6','tours_7','tours_8','tours_9','tours_10']
-    basePath = 'D:/MIRI/hackupc2021/floorfy'
-    outputPath = 'D:/MIRI/hackupc2021/floorfy/stage'
+    basePath = 'D:/MIRI/hackupc2021/floorfy/raw'
+    outputPath = 'D:/MIRI/hackupc2021/floorfy/demo'
+    count = 0
     for tourFolder in toursFolders:
         outputTourFolder = os.path.join(outputPath,tourFolder)
         os.mkdir(outputTourFolder)
@@ -20,6 +22,7 @@ if __name__ == '__main__':
             for equirrectangularImage in equirrectangularImages:
                 outputTourFolderTourImage = os.path.join(outputTourFolderTour,equirrectangularImage)
                 os.mkdir(outputTourFolderTourImage)
+                start_time = time.time()
                 equ = E2P.Equirectangular(os.path.join(fullPathFolder2,equirrectangularImage))    # Load equirectangular image
                 imgFront = equ.GetPerspective(90, 0, 0, 1080, 1080) # Specify parameters(FOV, theta, phi, height, width)
                 imgRight = equ.GetPerspective(90, 90, 0, 1080, 1080) # Specify parameters(FOV, theta, phi, height, width)
@@ -30,8 +33,14 @@ if __name__ == '__main__':
 
                 imgH = cv2.hconcat([imgFront, imgRight, imgBack, imgLeft])
                 cv2.imwrite(os.path.join(outputTourFolderTourImage,'horizontalView.jpg'), imgH)
+                cv2.imwrite(os.path.join(outputTourFolderTourImage,'imgFront.jpg'), imgFront)
+                cv2.imwrite(os.path.join(outputTourFolderTourImage,'imgBack.jpg'), imgBack)
+                cv2.imwrite(os.path.join(outputTourFolderTourImage,'imgLeft.jpg'), imgLeft)
+                cv2.imwrite(os.path.join(outputTourFolderTourImage,'imgRight.jpg'), imgRight)
                 cv2.imwrite(os.path.join(outputTourFolderTourImage,'topView.jpg'), imgUp)
                 cv2.imwrite(os.path.join(outputTourFolderTourImage,'bottomView.jpg'), imgDown)
+                count += 1
+                print("Image: "+str(count).zfill(5)+" --- %s seconds ---" % round(time.time() - start_time,3))
                 
                 
 
